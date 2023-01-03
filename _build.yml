@@ -7,8 +7,9 @@ steps:
   submodules: recursive
 
 - bash: |
-    cd ..
     pwd
+    cd ..
+    cd ..
     ls -R
 
 - task: UseDotNet@2 
