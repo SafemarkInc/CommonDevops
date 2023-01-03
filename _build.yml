@@ -32,7 +32,7 @@ steps:
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
     New-Item -ItemType "directory" -Path "./deploy/Terraform"
-    Copy-Item -Path $terraformPath -Destination "./deploy/Terraform" -Recurse
+    Copy-Item -Path $(terraformPath) -Destination "./deploy/Terraform" -Recurse
     Copy-Item -Path "./CommonDevops/*" -Destination "./deploy/Terraform" -Recurse
     Copy-Item -Path "Publish/*" -Destination "./deploy"
   displayName: Assemble the deployment package
