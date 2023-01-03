@@ -10,6 +10,7 @@ steps:
     cd ..
     cd ..
     ls -R
+- powershell: echo $(terraformPath)
 
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
