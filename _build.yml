@@ -1,0 +1,38 @@
+parameters:
+- name: buildProjectPath
+  type: string
+- name: terraformPath
+  type: string
+
+steps:
+- task: UseDotNet@2 
+  displayName: ".NET Core 6.0.x"
+  inputs:
+    version: '6.0.x'
+  
+- task: DotNetCoreCLI@2
+  displayName: dotnet publish
+  inputs:
+    command: publish
+    projects: '$(buildProjectPath)'
+    publishWebProjects: True
+    arguments: '--configuration Release --output Publish'
+    zipAfterPublish: True
+
+- powershell: |
+    New-Item -Name deploy -ItemType "Directory"
+    $DeployScript = Get-Content .\CommonDevops\deploy.ps1
+    $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
+    $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
+    $DeployScript | Out-File ./deploy/deploy.ps1
+    Copy-Item -Path ${{ parameters.terraformPath }} -Destination "./deploy" -Recurse -Verbose
+    Copy-Item -Path "./CommonDevops/US" -Destination "./deploy/Terraform" -Recurse -Verbose
+    Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/Terraform" -Recurse -Verbose
+    Copy-Item -Path "./CommonDevops/_build.yml" -Destination "./deploy/Terraform"
+    Copy-Item -Path "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/Terraform"
+    Copy-Item -Path "Publish/*" -Destination "./deploy"
+  displayName: Assemble the deployment package
+  
+- publish: ./deploy
+  displayName: Publish artifact
+  artifact: deploy
