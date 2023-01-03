@@ -5,6 +5,11 @@ parameters:
   type: string
 
 steps:
+- bash:
+    pwd
+    cd ..
+    ls -R
+    ls {{ parameters.terraformPath }}
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
