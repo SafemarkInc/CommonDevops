@@ -6,6 +6,11 @@ steps:
 - checkout: self  # self represents the repo where the initial Pipelines YAML file was found
   submodules: recursive
 
+- bash: |
+    cd ..
+    pwd
+    ls -R
+
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
