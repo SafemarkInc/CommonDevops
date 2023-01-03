@@ -30,9 +30,9 @@ steps:
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
-    New-Item -ItemType "directory" -Path "./deploy/Terraform"
     Copy-Item -Path ${{ parameters.terraformPath }} -Destination "./deploy" -Recurse -Verbose
-    Copy-Item -Path "./CommonDevops/*" -Destination "./deploy/Terraform" -Recurse
+    Copy-Item -Path "./CommonDevops/_build.yml" -Destination "./deploy/Terraform"
+    Copy-Item -Path "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/Terraform"
     Copy-Item -Path "Publish/*" -Destination "./deploy"
   displayName: Assemble the deployment package
   
