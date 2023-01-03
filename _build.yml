@@ -7,9 +7,9 @@ parameters:
 steps:
 - bash:
     pwd
-    cd ..
+    cd ../..
     ls -R
-    ls {{ parameters.terraformPath }}
+    ls ${{ parameters.terraformPath }}
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
