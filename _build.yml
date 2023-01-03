@@ -26,8 +26,8 @@ steps:
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
     Copy-Item -Path ${{ parameters.terraformPath }} -Destination "./deploy" -Recurse -Verbose
-    Copy-Item -Path "./CommonDevops/US" -Destination "./deploy" -Recurse -Verbose
-    Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy" -Recurse -Verbose
+    Copy-Item -Path "./CommonDevops/US" -Destination "./deploy/Terraform" -Recurse -Verbose
+    Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/Terraform" -Recurse -Verbose
     Copy-Item -Path "./CommonDevops/_build.yml" -Destination "./deploy/Terraform"
     Copy-Item -Path "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/Terraform"
     Copy-Item -Path "Publish/*" -Destination "./deploy"
