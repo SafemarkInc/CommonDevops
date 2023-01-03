@@ -1,0 +1,37 @@
+parameters:
+- name: buildProjectPath
+  type: string
+
+steps:
+- checkout: self  # self represents the repo where the initial Pipelines YAML file was found
+  submodules: recursive
+
+- task: UseDotNet@2 
+  displayName: ".NET Core 6.0.x"
+  inputs:
+    version: '6.0.x'
+  
+- task: DotNetCoreCLI@2
+  displayName: dotnet publish
+  inputs:
+    command: publish
+    projects: '$(buildProjectPath)'
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --output Publish'
+    zipAfterPublish: True
+
+- powershell: |
+    New-Item -Name deploy -ItemType "Directory"
+    $DeployScript = Get-Content .\CommonDevops\deploy.ps1
+    $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
+    $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
+    $DeployScript | Out-File ./deploy/deploy.ps1
+    New-Item -ItemType "directory" -Path "./deploy/Terraform"
+    Copy-Item -Path "./Terraform/*" -Destination "./deploy/Terraform" -Recurse
+    Copy-Item -Path "./CommonDevops/*" -Destination "./deploy/Terraform" -Recurse
+    Copy-Item -Path "Publish/*" -Destination "./deploy"
+  displayName: Assemble the deployment package
+  
+- publish: ./deploy
+  displayName: Publish artifact
+  artifact: deploy
