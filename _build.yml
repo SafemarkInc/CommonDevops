@@ -17,7 +17,7 @@ steps:
     command: publish
     projects: '$(buildProjectPath)'
     publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output Publish'
+    arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
 
 - powershell: |
