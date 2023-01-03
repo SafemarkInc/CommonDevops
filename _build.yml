@@ -10,7 +10,7 @@ steps:
     cd ..
     cd ..
     ls -R
-- powershell: echo $(terraformPath)
+- powershell: echo ${{ parameters.terraformPath }}
 
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
@@ -33,7 +33,7 @@ steps:
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
     New-Item -ItemType "directory" -Path "./deploy/Terraform"
-    Copy-Item -Path $(terraformPath) -Destination "./deploy/Terraform" -Recurse
+    Copy-Item -Path ${{ parameters.terraformPath }} -Destination "./deploy/Terraform" -Recurse
     Copy-Item -Path "./CommonDevops/*" -Destination "./deploy/Terraform" -Recurse
     Copy-Item -Path "Publish/*" -Destination "./deploy"
   displayName: Assemble the deployment package
