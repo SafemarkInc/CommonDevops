@@ -3,19 +3,19 @@ variable "AZURE_CLIENTID" { type = string }
 variable "AZURE_TENANTID" { type = string }
 variable "AZURE_CLIENTSECRET" { type = string }
 
-variable "STATEFILE_STORAGEACCOUNTNAME" { type = string }
-variable "STATEFILE_CONTAINERNAME" { type = string }
-
 terraform {
   backend "azurerm" {}
+}
+
+provider "azurerm" {
+  features {}
+  subscription_id = var.AZURE_SUBSCRIPTIONID
+  client_id       = var.AZURE_CLIENTID
+  tenant_id       = var.AZURE_TENANTID
+  client_secret   = var.AZURE_CLIENTSECRET
 }
 
 module "all_resources" {
   source   = "../../Terraform"
   LOCATION = "centralus"
-
-  AZURE_SUBSCRIPTIONID = var.AZURE_SUBSCRIPTIONID
-  AZURE_CLIENTID       = var.AZURE_CLIENTID
-  AZURE_TENANTID       = var.AZURE_TENANTID
-  AZURE_CLIENTSECRET   = var.AZURE_CLIENTSECRET
 }
