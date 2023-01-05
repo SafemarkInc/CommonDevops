@@ -5,14 +5,9 @@ variable "AZURE_CLIENTSECRET" { type = string }
 
 variable "STATEFILE_STORAGEACCOUNTNAME" { type = string }
 variable "STATEFILE_CONTAINERNAME" { type = string }
-variable "STATEFILE_KEY" { type = string }
 
 terraform {
-  backend "azurerm" {
-    storage_account_name = "saterraform54261"
-    container_name       = "smgopaymentservice-state"
-    key                  = "smgopaymentservice.tfstate"
-  }
+  backend "azurerm" {}
 }
 
 module "all_resources" {
