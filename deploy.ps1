@@ -28,20 +28,14 @@ Write-Output "$(Get-TimeStamp) Done. Initializing Terraform and switching to $Te
 Set-Location ($PSScriptRoot + '/Terraform/' + $Cloud)
 ./terraform_init.ps1 $TerraformEnvironment
 
-function GetAllResourcesFromTerraform
-{
-    $TerraformState = terraform show -json | ConvertFrom-Json
-    $TerraformState.values.root_module.child_modules | Where-Object {$_.address -eq "module.all_resources"}
-}
-
-$AllResources = GetAllResourcesFromTerraform
-
 Write-Output "$(Get-TimeStamp) Done. Applying Terraform..."
 terraform apply -auto-approve -no-color
 if (!$?) { throw 'terraform apply failed' }
 Write-Output "$(Get-TimeStamp) Done."
 Write-Output ''
 
+$TerraformState = terraform show -json | ConvertFrom-Json
+$AllResources = $TerraformState.values.root_module.child_modules | Where-Object {$_.address -eq "module.all_resources"}
 Set-Location ../..
 
 $TerraformWebapp = $AllResources.resources | Where-Object {$_.address -eq "module.all_resources.azurerm_app_service.main"} | Select-Object -ExpandProperty values
