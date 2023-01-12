@@ -14,7 +14,6 @@ if ($cloud -eq 'Korea') {
 
 Write-Output ('Workspace is ' + $workspace)
 
-. ..\..\Terraform\_settings.ps1
 $Env:ARM_SAS_TOKEN=$(az keyvault secret show --vault-name $keyvault --name 'TerraformBackendSasKey' --query value --output tsv)
 $env:TF_VAR_AZURE_CLIENTSECRET=$(az keyvault secret show --vault-name $KeyVault --name $clientSecretName --query value --output tsv)
 
