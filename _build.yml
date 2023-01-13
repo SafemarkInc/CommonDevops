@@ -3,6 +3,10 @@ parameters:
   type: string
 - name: terraformPath
   type: string
+- name: terraformResourcegroupName
+  type: string
+- name: terraformWebappName
+  type: string
 
 steps:
 - task: UseDotNet@2 
@@ -24,6 +28,8 @@ steps:
     $DeployScript = Get-Content .\CommonDevops\deploy.ps1
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
+    $DeployScript = ,('$ResourcegroupName = "${{ parameters.terraformResourcegroupName }}"') + $DeployScript
+    $DeployScript = ,('$WebappName = "${{ parameters.terraformWebappName }}"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
     Copy-Item -Path ${{ parameters.terraformPath }} -Destination "./deploy" -Recurse -Verbose
     New-Item "./deploy/CommonDevops" -ItemType Directory

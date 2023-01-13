@@ -35,17 +35,17 @@ Write-Output "$(Get-TimeStamp) Done."
 Write-Output ''
 
 $TerraformState = terraform show -json | ConvertFrom-Json
-$AllResources = $TerraformState.values.root_module.child_modules | Where-Object {$_.address -eq "module.all_resources"}
+$AllResources = $TerraformState.values.root_module.child_modules[0].child_modules.resources
 Set-Location ../..
 
-$TerraformWebapp = $AllResources.resources | Where-Object {$_.address -eq "module.all_resources.azurerm_app_service.main"} | Select-Object -ExpandProperty values
+$TerraformWebapp = $AllResources | Where-Object {$_.address -eq $WebappName} | Select-Object -ExpandProperty values
 $deploymentFile = Get-ChildItem *.zip -Name
 Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformWebapp.name) ..."
 az webapp deployment source config-zip -g $TerraformWebapp.resource_group_name --n $TerraformWebapp.name --src $deploymentFile
 if ($LASTEXITCODE -ne 0) { throw }
 Write-Output "$(Get-TimeStamp) Done."
 
-$TerraformResourceGroup = $AllResources.resources | Where-Object {$_.address -eq "module.all_resources.azurerm_resource_group.main"} | Select-Object -ExpandProperty values
+$TerraformResourceGroup = $AllResources | Where-Object {$_.address -eq $ResourcegroupName} | Select-Object -ExpandProperty values
 Write-Output "$(Get-TimeStamp) Updating labels for $($TerraformResourceGroup.name) ..."
 $deploymentDate = $(Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
 az tag update --resource-id $TerraformResourceGroup.Id --operation merge --tags DevopsBuild=$BuildNumber DeploymentDateUTC=$deploymentDate DevopsDeployment=$env:RELEASE_RELEASENAME
