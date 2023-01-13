@@ -15,7 +15,7 @@ provider "azurerm" {
   client_secret   = var.AZURE_CLIENTSECRET
 }
 
-module "all_resources" {
-  source   = "../../Terraform"
+module "common" {
+  source   = "./.."
   LOCATION = "centralus"
 }
