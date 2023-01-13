@@ -25,7 +25,7 @@ $Env:ARM_CLIENT_SECRET=$Env:AZURE_SERVICEPRINCIPAL_PASSWORD
 $Env:ARM_TENANT_ID=$Env:AZURE_SERVICEPRINCIPAL_TENANTID
 $TerraformEnvironment = $Env:RELEASE_ENVIRONMENTNAME.Split()[1]
 Write-Output "$(Get-TimeStamp) Done. Initializing Terraform and switching to $TerraformEnvironment workspace..."
-Set-Location ($PSScriptRoot + '/Terraform/' + $Cloud)
+Set-Location ($PSScriptRoot + '/CommonDevops/' + $Cloud)
 ./terraform_init.ps1 $TerraformEnvironment
 
 Write-Output "$(Get-TimeStamp) Done. Applying Terraform..."
