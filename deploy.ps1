@@ -45,7 +45,7 @@ az webapp deployment source config-zip -g $TerraformWebapp.resource_group_name -
 if ($LASTEXITCODE -ne 0) { throw }
 Write-Output "$(Get-TimeStamp) Done."
 
-$TerraformResourceGroup = $AllResources | Where-Object {$_.address -eq $ResourcegroupName} | Select-Object -ExpandProperty values
+$TerraformResourceGroup = $AllResources | Where-Object {$_.address -eq $MainResourceName} | Select-Object -ExpandProperty values
 Write-Output "$(Get-TimeStamp) Updating labels for $($TerraformResourceGroup.name) ..."
 $deploymentDate = $(Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
 az tag update --resource-id $TerraformResourceGroup.Id --operation merge --tags DevopsBuild=$BuildNumber BuildDate=$BuildDate DeploymentDateUTC=$deploymentDate DevopsDeployment=$env:RELEASE_RELEASENAME
