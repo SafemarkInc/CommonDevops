@@ -48,5 +48,5 @@ Write-Output "$(Get-TimeStamp) Done."
 $TerraformResourceGroup = $AllResources | Where-Object {$_.address -eq $ResourcegroupName} | Select-Object -ExpandProperty values
 Write-Output "$(Get-TimeStamp) Updating labels for $($TerraformResourceGroup.name) ..."
 $deploymentDate = $(Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
-az tag update --resource-id $TerraformResourceGroup.Id --operation merge --tags DevopsBuild=$BuildNumber DeploymentDateUTC=$deploymentDate DevopsDeployment=$env:RELEASE_RELEASENAME
+az tag update --resource-id $TerraformResourceGroup.Id --operation merge --tags DevopsBuild=$BuildNumber BuildDate=$BuildDate DeploymentDateUTC=$deploymentDate DevopsDeployment=$env:RELEASE_RELEASENAME
 Write-Output "$(Get-TimeStamp) Done."
