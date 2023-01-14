@@ -18,7 +18,7 @@ steps:
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: '$(buildProjectPath)'
+    projects: '$(Env:SYSTEM_TEAMPROJECT)\$(buildProjectPath)'
     publishWebProjects: True
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
@@ -33,7 +33,7 @@ steps:
     $DeployScript = ,('$MainResourceName = "${{ parameters.terraformMainResource }}"') + $DeployScript
     $DeployScript = ,('$WebappName = "${{ parameters.terraformWebappName }}"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
-    Copy-Item -Path ${{ parameters.terraformPath }} -Destination "./deploy" -Recurse -Verbose
+    Copy-Item -Path "${Env:SYSTEM_TEAMPROJECT}\${{ parameters.terraformPath }}" -Destination "./deploy" -Recurse -Verbose
     New-Item "./deploy/CommonDevops" -ItemType Directory
     Copy-Item -Path "./CommonDevops/US" -Destination "./deploy/CommonDevops" -Recurse -Verbose
     Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/CommonDevops" -Recurse -Verbose
