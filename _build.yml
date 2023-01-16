@@ -3,6 +3,10 @@ parameters:
   type: string
 - name: terraformPath
   type: string
+- name: terraformMainResource
+  type: string
+- name: terraformWebappName
+  type: string
 
 steps:
 - task: UseDotNet@2 
@@ -14,22 +18,27 @@ steps:
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: '$(buildProjectPath)'
+    projects: '$(Env:SYSTEM_TEAMPROJECT)\$(buildProjectPath)'
     publishWebProjects: True
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
 
 - powershell: |
+    pwd
+    dir env:
     New-Item -Name deploy -ItemType "Directory"
     $DeployScript = Get-Content .\CommonDevops\deploy.ps1
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
+    $DeployScript = ,('$MainResourceName = "${{ parameters.terraformMainResource }}"') + $DeployScript
+    $DeployScript = ,('$WebappName = "${{ parameters.terraformWebappName }}"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
-    Copy-Item -Path ${{ parameters.terraformPath }} -Destination "./deploy" -Recurse -Verbose
-    Copy-Item -Path "./CommonDevops/US" -Destination "./deploy/Terraform" -Recurse -Verbose
-    Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/Terraform" -Recurse -Verbose
-    Copy-Item -Path "./CommonDevops/_build.yml" -Destination "./deploy/Terraform"
-    Copy-Item -Path "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/Terraform"
+    Copy-Item -Path "${Env:SYSTEM_TEAMPROJECT}\${{ parameters.terraformPath }}" -Destination "./deploy" -Recurse -Verbose
+    New-Item "./deploy/CommonDevops" -ItemType Directory
+    Copy-Item -Path "./CommonDevops/US" -Destination "./deploy/CommonDevops" -Recurse -Verbose
+    Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/CommonDevops" -Recurse -Verbose
+    Copy-Item "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/CommonDevops"
+    Copy-Item "./CommonDevops/common.tf" -Destination "./deploy/CommonDevops"
     Copy-Item -Path "Publish/*" -Destination "./deploy"
   displayName: Assemble the deployment package
   

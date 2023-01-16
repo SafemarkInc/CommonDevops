@@ -25,16 +25,8 @@ $Env:ARM_CLIENT_SECRET=$Env:AZURE_SERVICEPRINCIPAL_PASSWORD
 $Env:ARM_TENANT_ID=$Env:AZURE_SERVICEPRINCIPAL_TENANTID
 $TerraformEnvironment = $Env:RELEASE_ENVIRONMENTNAME.Split()[1]
 Write-Output "$(Get-TimeStamp) Done. Initializing Terraform and switching to $TerraformEnvironment workspace..."
-Set-Location ($PSScriptRoot + '/Terraform/' + $Cloud)
+Set-Location ($PSScriptRoot + '/CommonDevops/' + $Cloud)
 ./terraform_init.ps1 $TerraformEnvironment
-
-function GetAllResourcesFromTerraform
-{
-    $TerraformState = terraform show -json | ConvertFrom-Json
-    $TerraformState.values.root_module.child_modules | Where-Object {$_.address -eq "module.all_resources"}
-}
-
-$AllResources = GetAllResourcesFromTerraform
 
 Write-Output "$(Get-TimeStamp) Done. Applying Terraform..."
 terraform apply -auto-approve -no-color
@@ -42,17 +34,19 @@ if (!$?) { throw 'terraform apply failed' }
 Write-Output "$(Get-TimeStamp) Done."
 Write-Output ''
 
+$TerraformState = terraform show -json | ConvertFrom-Json
+$AllResources = $TerraformState.values.root_module.child_modules[0].child_modules.resources
 Set-Location ../..
 
-$TerraformWebapp = $AllResources.resources | Where-Object {$_.address -eq "module.all_resources.azurerm_app_service.main"} | Select-Object -ExpandProperty values
+$TerraformWebapp = $AllResources | Where-Object {$_.address -eq $WebappName} | Select-Object -ExpandProperty values
 $deploymentFile = Get-ChildItem *.zip -Name
 Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformWebapp.name) ..."
 az webapp deployment source config-zip -g $TerraformWebapp.resource_group_name --n $TerraformWebapp.name --src $deploymentFile
 if ($LASTEXITCODE -ne 0) { throw }
 Write-Output "$(Get-TimeStamp) Done."
 
-$TerraformResourceGroup = $AllResources.resources | Where-Object {$_.address -eq "module.all_resources.azurerm_resource_group.main"} | Select-Object -ExpandProperty values
+$TerraformResourceGroup = $AllResources | Where-Object {$_.address -eq $MainResourceName} | Select-Object -ExpandProperty values
 Write-Output "$(Get-TimeStamp) Updating labels for $($TerraformResourceGroup.name) ..."
 $deploymentDate = $(Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
-az tag update --resource-id $TerraformResourceGroup.Id --operation merge --tags DevopsBuild=$BuildNumber DeploymentDateUTC=$deploymentDate DevopsDeployment=$env:RELEASE_RELEASENAME
+az tag update --resource-id $TerraformResourceGroup.Id --operation merge --tags DevopsBuild=$BuildNumber BuildDate=$BuildDate DeploymentDateUTC=$deploymentDate DevopsDeployment=$env:RELEASE_RELEASENAME
 Write-Output "$(Get-TimeStamp) Done."
