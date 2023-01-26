@@ -17,7 +17,7 @@ steps:
   inputs:
     version: '6.0.x'
 
-- script: dotnet test ${{ parameters.testProjectPath }}
+- script: dotnet test "$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.testProjectPath }}"
   condition: ne('${{ parameters.testProjectPath }}', '')
   displayName: dotnet test
 
