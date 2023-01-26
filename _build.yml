@@ -3,7 +3,7 @@ parameters:
   type: string
 - name: testProjectPath
   type: string
-  default: ''
+  default: null
 - name: terraformPath
   type: string
 - name: terraformMainResource
@@ -22,13 +22,13 @@ steps:
   displayName: dotnet test
   inputs:
     command: test
-    projects: '$(Env:SYSTEM_TEAMPROJECT)\$(testProjectPath)'
+    projects: '$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.testProjectPath }}'
 
 - task: DotNetCoreCLI@2
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: '$(Env:SYSTEM_TEAMPROJECT)\$(buildProjectPath)'
+    projects: '$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.buildProjectPath }}'
     publishWebProjects: True
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
