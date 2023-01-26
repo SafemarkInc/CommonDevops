@@ -1,6 +1,9 @@
 parameters:
 - name: buildProjectPath
   type: string
+- name: testProjectPath
+  type: string
+  default: null
 - name: terraformPath
   type: string
 - name: terraformMainResource
@@ -14,6 +17,13 @@ steps:
   inputs:
     version: '6.0.x'
   
+- task: DotNetCoreCLI@2
+  condition: ne(parameters.testProjectPath, null)
+  displayName: dotnet test
+  inputs:
+    command: test
+    projects: '$(Env:SYSTEM_TEAMPROJECT)\$(testProjectPath)'
+
 - task: DotNetCoreCLI@2
   displayName: dotnet publish
   inputs:
