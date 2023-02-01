@@ -19,3 +19,19 @@ $env:TF_VAR_AZURE_CLIENTSECRET=$(az keyvault secret show --vault-name $KeyVault 
 
 terraform init -backend-config='../../Terraform/backend.conf' -no-color
 terraform workspace select $workspace -no-color
+
+# For any services migrating into this DevOps system, upgrade from the previous way we did namespaces to the new one.
+$OldAddressPrefix = 'module.all_resources.'
+$NewAddressPrefix = 'module.common.module.all_resources.'
+$TerraformState = terraform show -json | ConvertFrom-Json
+$ResourcesInOldNamespace = $TerraformState.values.root_module.child_modules[0].resources |
+    Where-Object {$_.address -like "$OldAddressPrefix*" }
+
+foreach ($ResourceInOldNamespace in $ResourcesInOldNamespace) {
+    $OldAddress = $ResourceInOldNamespace.address
+    $NewAddress = $OldAddress.replace($OldAddressPrefix, $NewAddressPrefix)    
+    Write-Output "Migrating $OldAddress to $NewAddress..."
+    terraform state mv $OldAddress $NewAddress
+    Write-Output "Done."
+    Write-Output ""
+}
