@@ -16,6 +16,13 @@ git commit * -m "Added CommonDevops into this repo"
 git push --set-upstream origin add-common-devops
 ```
 - Open Pipelines/build.yml in a text editor and fill in everything that says FILL_THIS_IN.
+- Rearrange the Terraform directory to look like the one in GoReporting and TemplateService.
+- Add a backend.conf, similar to one of the two projects above. Make sure the information in it is correct.
+- From the CommonDevops/us directory, run the following from Powershell and make sure the result looks reasonable. You will probably need to do some adjusting to your Terraform files to make them work in this new system, but you should get helpful errors to make that easy:
+```
+./terraform_init.ps1
+terraform plan
+```
 - Add Git to Azure pipelines project
   - Navigate to the corresponding project in Azure Pipeines
   - Project Settings > Service Connections > New Service Connection
