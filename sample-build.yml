@@ -1,0 +1,27 @@
+trigger:
+- master
+  
+pr:
+- '*'
+
+resources:
+  repositories:
+    - repository: CommonDevopsRepo
+      type: github
+      name: SafemarkInc/CommonDevops
+      ref: COMMONDEVOPS_SHA
+      endpoint: github
+
+pool:
+  vmImage: 'windows-2022'
+
+steps:
+- checkout: self
+  submodules: recursive
+- checkout: CommonDevopsRepo
+- template: _build.yml@CommonDevopsRepo
+  parameters:
+    buildProjectPath: 'TemplateService/TemplateService.csproj'
+    terraformPath: 'Terraform'
+    terraformMainResource: module.common.module.all_resources.azurerm_resource_group.only
+    terraformWebappName: module.common.module.all_resources.azurerm_windows_web_app.only
