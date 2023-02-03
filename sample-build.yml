@@ -21,7 +21,8 @@ steps:
 - checkout: CommonDevopsRepo
 - template: _build.yml@CommonDevopsRepo
   parameters:
-    buildProjectPath: 'TemplateService/TemplateService.csproj'
-    terraformPath: 'Terraform'
-    terraformMainResource: module.common.module.all_resources.azurerm_resource_group.only
-    terraformWebappName: module.common.module.all_resources.azurerm_windows_web_app.only
+    buildProjectPath: FILL_THIS_IN           # Example: 'GoReporting/GoReporting.csproj'
+    testProjectPath: FILL_THIS_IN (Optional) # Example: 'GoReporting.Tests/GoReporting.Tests.csproj'
+    terraformPath: FILL_THIS_IN              # Example: 'Terraform'
+    terraformMainResource: FILL_THIS_IN      # Example: module.common.module.all_resources.azurerm_resource_group.main
+    terraformWebappName: FILL_THIS_IN        # Example: module.common.module.all_resources.azurerm_windows_web_app.main

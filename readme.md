@@ -15,3 +15,17 @@ git add ./Pipelines/build.yml
 git commit * -m "Added CommonDevops into this repo"
 git push --set-upstream origin add-common-devops
 ```
+- Open Pipelines/build.yml in a text editor and fill in everything that says FILL_THIS_IN.
+- Add Git to Azure pipelines project
+  - Navigate to the corresponding project in Azure Pipeines
+  - Project Settings > Service Connections > New Service Connection
+  - GitHub, Next
+    - Grant authorization
+    - Oauth Configuration: AzurePipelines
+    - Authorize
+    - Service connection name: github (all lowercase)
+    - Save
+- Manually trigger a build in Azure pipelines
+- Navigate into the Job
+- You will see a banner asking for permission with a button to grant permission. Use this button to grant permission.
+- The build should begin. If there are any errors, fix them.
