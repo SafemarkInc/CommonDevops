@@ -13,5 +13,5 @@ Set-Content $buildYmlContents -Path ./Pipelines/build.yml
 git checkout -b add-common-devops
 git add ./Pipelines/build.yml
 git commit * -m "Added CommonDevops into this repo"
-git push
+git push --set-upstream origin add-common-devops
 ```
