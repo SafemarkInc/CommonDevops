@@ -18,7 +18,6 @@ if ($cloud -eq 'Korea') {
     $workspace = 'korea_' + $workspace
 }
 
-
 $Env:ARM_SAS_TOKEN=$(az keyvault secret show --vault-name $keyvault --name 'TerraformBackendSasKey' --query value --output tsv)
 $env:TF_VAR_AZURE_CLIENTSECRET=$(az keyvault secret show --vault-name $KeyVault --name $clientSecretName --query value --output tsv)
 
