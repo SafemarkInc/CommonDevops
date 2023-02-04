@@ -31,8 +31,7 @@ steps:
     zipAfterPublish: True
 
 - powershell: |
-    pwd
-    dir env:
+    Get-ChildItem -Recurse
     New-Item -Name deploy -ItemType "Directory"
     $DeployScript = Get-Content .\CommonDevops\deploy.ps1
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
