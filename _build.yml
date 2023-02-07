@@ -43,7 +43,7 @@ steps:
 
 - powershell: |
     $ProjectDir = ${Env:BUILD_REPOSITORY_NAME}.Split("/")[1]
-    New-Item -Name deploy -ItemType "Directory"
+    New-Item -Name deploy -ItemType "Directory" -Force
     $DeployScript = Get-Content .\CommonDevops\deploy.ps1
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
