@@ -37,7 +37,7 @@ steps:
 - script: |
     dotnet add .\SafemarkIdentity\SafemarkIdentity.csproj package Microsoft.EntityFrameworkCore.Design --version 6.0.12
     dotnet tool install --global dotnet-ef --version 6.0.12
-    dotnet ef migrations script --project .\SafemarkIdentity --idempotent --output ./deploy/upgrade_schema.sql
+    dotnet ef migrations script --project ./SafemarkIdentity/SafemarkIdentity --idempotent --output ./deploy/upgrade_schema.sql
     cat ./deploy/upgrade_schema.sql
   displayName: Generate SQL upgrade script
 
