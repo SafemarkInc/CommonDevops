@@ -1,0 +1,28 @@
+trigger:
+- master
+  
+pr:
+- '*'
+
+resources:
+  repositories:
+    - repository: CommonDevopsRepo
+      type: github
+      name: SafemarkInc/CommonDevops
+      ref: COMMONDEVOPS_SHA
+      endpoint: github
+
+pool:
+  vmImage: 'windows-2022'
+
+steps:
+- checkout: self
+  submodules: recursive
+- checkout: CommonDevopsRepo
+- template: _build.yml@CommonDevopsRepo
+  parameters:
+    buildProjectPath: FILL_THIS_IN           # Example: 'GoReporting/GoReporting.csproj'
+    testProjectPath: FILL_THIS_IN (Optional) # Example: 'GoReporting.Tests/GoReporting.Tests.csproj'
+    terraformPath: FILL_THIS_IN              # Example: 'Terraform'
+    terraformMainResource: FILL_THIS_IN      # Example: module.common.module.all_resources.azurerm_resource_group.main
+    terraformWebappName: FILL_THIS_IN        # Example: module.common.module.all_resources.azurerm_windows_web_app.main
