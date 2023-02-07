@@ -21,20 +21,21 @@ steps:
   condition: ne('${{ parameters.testProjectPath }}', '')
   displayName: dotnet test
 
-- task: DotNetCoreCLI@2
-  displayName: dotnet publish
-  inputs:
-    command: publish
-    projects: '$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.buildProjectPath }}'
-    publishWebProjects: True
-    arguments: '--configuration Release --output Publish'
-    zipAfterPublish: True
+#- task: DotNetCoreCLI@2
+#  displayName: dotnet publish
+#  inputs:
+#    command: publish
+#    projects: '$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.buildProjectPath }}'
+#    publishWebProjects: True
+#    arguments: '--configuration Release --output Publish'
+#    zipAfterPublish: True
 
 # Run this after the publish step so that the additional package doesn't add weight to the publish.
 # TODO: Make this step optional
 # TODO: Make the project configurable
 # TODO: Pull version 6.0.12 out into a variable
 - script: |
+    pwd
     dotnet add ./SafemarkIdentity/SafemarkIdentity.csproj package Microsoft.EntityFrameworkCore.Design --version 6.0.12
     dotnet tool install --global dotnet-ef --version 6.0.12
     dotnet ef migrations script --project ./SafemarkIdentity/SafemarkIdentity --idempotent --output ./deploy/upgrade_schema.sql
