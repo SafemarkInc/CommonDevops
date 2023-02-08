@@ -44,7 +44,7 @@ steps:
   inputs:
     command: publish
     projects: '$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.buildProjectPath }}'
-    publishWebProjects: True
+    publishWebProjects: ${{ length(parameters.webappDeploymentFile) }}
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
 
