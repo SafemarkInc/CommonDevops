@@ -30,6 +30,8 @@ steps:
     if (('${{ parameters.functionDeploymentFile }}'.Length -eq 0) -ne ('${{ parameters.terraformFunctionName }}'.Length -eq 0)) {
         throw "Either specify functionDeploymentFile and terraformFunctionName or don't specify either."
     }
+  displayName: Validate pipeilne parameters
+
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
@@ -43,7 +45,7 @@ steps:
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: '$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.buildProjectPath }}'
+    projects: '$(Env:SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}'
     publishWebProjects: ${{ length(parameters.webappDeploymentFile) }}
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
