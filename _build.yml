@@ -23,10 +23,10 @@ parameters:
 
 steps:
 - powershell: |
-    Write-Host ${{ parameters.terraformWebappName }}
-    Write-Host ${{ parameters.terraformWebappName }}.Length
-    Write-Host ${{ parameters.terraformFunctionName }}
-    Write-Host ${{ parameters.terraformFunctionName }}.Length
+    Write-Host '${{ parameters.terraformWebappName }}'
+    Write-Host '${{ parameters.terraformWebappName }}'.Length
+    Write-Host '${{ parameters.terraformFunctionName }}'
+    Write-Host '${{ parameters.terraformFunctionName }}'.Length
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
