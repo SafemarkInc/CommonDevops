@@ -30,6 +30,10 @@ steps:
     if (('${{ parameters.functionDeploymentFile }}'.Length -eq 0) -ne ('${{ parameters.terraformFunctionName }}'.Length -eq 0)) {
         throw "Either specify functionDeploymentFile and terraformFunctionName or don't specify either."
     }
+
+    Write-Host "$(Env:SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}"
+    pwd
+    ls -R
   displayName: Validate pipeilne parameters
 
 - task: UseDotNet@2 
