@@ -23,11 +23,11 @@ parameters:
 
 steps:
 - powershell: |
-    if (('${{ parameters.webappDeploymentFile }}'.Length -eq 0) -eq ('${{ parameters.terraformWebappName }}'.Length -eq 0)) {
+    if (('${{ parameters.webappDeploymentFile }}'.Length -eq 0) -ne ('${{ parameters.terraformWebappName }}'.Length -eq 0)) {
         throw "Either specify webappDeploymentFile and terraformWebappName or don't specify either."
     }
 
-    if (('${{ parameters.functionDeploymentFile }}'.Length -eq 0) -eq ('${{ parameters.terraformFunctionName }}'.Length -eq 0)) {
+    if (('${{ parameters.functionDeploymentFile }}'.Length -eq 0) -ne ('${{ parameters.terraformFunctionName }}'.Length -eq 0)) {
         throw "Either specify functionDeploymentFile and terraformFunctionName or don't specify either."
     }
 - task: UseDotNet@2 
