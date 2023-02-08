@@ -31,7 +31,7 @@ steps:
         throw "Either specify functionDeploymentFile and terraformFunctionName or don't specify either."
     }
 
-    Write-Host "$(Env:SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}"
+    Write-Host "$($Env:SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}"
     pwd
     ls -R
   displayName: Validate pipeilne parameters
