@@ -31,9 +31,10 @@ steps:
         throw "Either specify functionDeploymentFile and terraformFunctionName or don't specify either."
     }
 
-    Write-Host "$($Env:SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}"
+    $dir = "$($Env:SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}"
+    Write-Host $dir
+    ls $dir
     pwd
-    ls -R
   displayName: Validate pipeilne parameters
 
 - task: UseDotNet@2 
