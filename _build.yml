@@ -50,9 +50,9 @@ steps:
   displayName: dotnet publish
   inputs:
     command: publish
+    projects: '$(SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}'
 #    projects: '$SYSTEM_TEAMPROJECT/${{ parameters.buildProjectPath }}'
     projects: 'IoT-DataStream-Processing/${{ parameters.buildProjectPath }}'
-#    projects: 'IoT-DataStream-Processing/IoT-Event-Processor/IoT-Event-Processor.csproj'
     publishWebProjects: ${{ length(parameters.webappDeploymentFile) }}
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
