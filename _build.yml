@@ -53,7 +53,7 @@ steps:
 #    projects: '$SYSTEM_TEAMPROJECT/${{ parameters.buildProjectPath }}'
     projects: './IoT-DataStream-Processing/IoT-Event-Processor/IoT-Event-Processor.csproj'
     publishWebProjects: ${{ length(parameters.webappDeploymentFile) }}
-    arguments: '-verbose --configuration Release --output Publish'
+    arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
 
 - powershell: |
