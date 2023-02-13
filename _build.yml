@@ -37,6 +37,8 @@ steps:
     pwd
   displayName: Validate pipeilne parameters
 
+- bash: printenv
+
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
