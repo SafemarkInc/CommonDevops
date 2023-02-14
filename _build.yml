@@ -38,7 +38,7 @@ steps:
   displayName: Validate pipeilne parameters
 
 - bash:  |
-    echo '$(SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}'
+    echo '$SYSTEM_TEAMPROJECT/${{ parameters.buildProjectPath }}'
     printenv
 
 - task: UseDotNet@2 
@@ -51,7 +51,7 @@ steps:
   displayName: dotnet test
 
 - bash: |
-    dotnet publish '$(SYSTEM_TEAMPROJECT)/${{ parameters.buildProjectPath }}' --configuration Release --output Publish
+    dotnet publish '$SYSTEM_TEAMPROJECT/${{ parameters.buildProjectPath }}' --configuration Release --output Publish
     zip -r dotnetproject.zip Publish
   displayName: dotnet publish
 
