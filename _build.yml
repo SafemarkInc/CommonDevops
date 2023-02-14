@@ -10,6 +10,10 @@ parameters:
   type: string
 - name: terraformWebappName
   type: string
+  default: ''
+- name: terraformFunctionName
+  type: string
+  default: ''
 
 steps:
 - task: UseDotNet@2 
@@ -21,12 +25,17 @@ steps:
   condition: ne('${{ parameters.testProjectPath }}', '')
   displayName: dotnet test
 
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/dotnet-core-cli-v2?view=azure-pipelines
+# If [publishWebProjects] is set to true, the projects property value is skipped, and the task tries to find the web
+# projects in the repository and run the publish command on them.
+#
+# We want to specify which projects to build instead of searching and building all of them.
 - task: DotNetCoreCLI@2
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: '$(Env:SYSTEM_TEAMPROJECT)\${{ parameters.buildProjectPath }}'
-    publishWebProjects: True
+    projects: '$(System.TeamProject)/${{ parameters.buildProjectPath }}'
+    publishWebProjects: false
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
 
@@ -37,7 +46,8 @@ steps:
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
     $DeployScript = ,('$MainResourceName = "${{ parameters.terraformMainResource }}"') + $DeployScript
-    $DeployScript = ,('$WebappName = "${{ parameters.terraformWebappName }}"') + $DeployScript
+    $DeployScript = ,('$TerraformWebappName = "${{ parameters.terraformWebappName }}"') + $DeployScript
+    $DeployScript = ,('$TerraformFunctionName = "${{ parameters.terraformFunctionName }}"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
     Copy-Item -Path "$ProjectDir\${{ parameters.terraformPath }}" -Destination "./deploy" -Recurse -Verbose
     New-Item "./deploy/CommonDevops" -ItemType Directory

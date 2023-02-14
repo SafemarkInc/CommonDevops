@@ -5,7 +5,7 @@ function Get-TimeStamp {
 }
 
 if ($NULL -eq $Env:RELEASE_ENVIRONMENTNAME) {
-    throw 'Please specify an environment (i.e. ''China dev'')'
+    throw 'Please set $Env:RELEASE_ENVIRONMENTNAME to a valid environment (i.e. ''China dev'')'
 }
 
 $Cloud = $Env:RELEASE_ENVIRONMENTNAME.Split()[0]
@@ -38,10 +38,20 @@ $TerraformState = terraform show -json | ConvertFrom-Json
 $AllResources = $TerraformState.values.root_module.child_modules[0].child_modules.resources
 Set-Location ../..
 
-$TerraformWebapp = $AllResources | Where-Object {$_.address -eq $WebappName} | Select-Object -ExpandProperty values
+if ($TerraformWebappName.Length -gt 0) {
+    $TerraformWebapp = $AllResources | Where-Object {$_.address -eq $TerraformWebappName} | Select-Object -ExpandProperty values
+} else {
+    $TerraformFunction = $AllResources | Where-Object {$_.address -eq $TerraformFunctionName} | Select-Object -ExpandProperty values
+}
 $deploymentFile = Get-ChildItem *.zip -Name
-Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformWebapp.name) ..."
-az webapp deployment source config-zip -g $TerraformWebapp.resource_group_name --n $TerraformWebapp.name --src $deploymentFile
+
+if ($null -ne $TerraformWebapp) {
+    Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformWebapp.name) ..."
+    az webapp deployment source config-zip -g $TerraformWebapp.resource_group_name --n $TerraformWebapp.name --src $deploymentFile
+} else {
+    Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformFunction.name) ..."
+    az functionapp deployment source config-zip -g $TerraformFunction.resource_group_name -n $TerraformFunction.name --src $deploymentFile
+}
 if ($LASTEXITCODE -ne 0) { throw }
 Write-Output "$(Get-TimeStamp) Done."
 
