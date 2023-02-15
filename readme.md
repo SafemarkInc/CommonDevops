@@ -44,3 +44,8 @@ terraform plan
   - Run
   - You will see a banner asking for permission with a button to grant permission. Use this button to grant permission.
 - The build should begin. If there are any errors, fix them.
+- The build will default to a pretty meaningless name. Rename it to 'build' using the elipses (...) menu.
+- Create a new release
+  - Navigate to the releases pipelnes (Rocket icon > Releases)
+  - New > New release pipeline
+  - Model after one of the other projects, such as IotDataStream
