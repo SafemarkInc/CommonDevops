@@ -14,13 +14,6 @@ parameters:
   default: ''
 
 steps:
-- bash: |
-    printenv
-    echo "$(Build.DefinitionName)"
-    echo "${{ split($(Build.DefinitionName), '.') }}"
-    echo "${{ split($(Build.DefinitionName), '.')[1] }}"
-    ls -R
-
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
