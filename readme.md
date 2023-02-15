@@ -17,8 +17,8 @@ git push --set-upstream origin add-common-devops
 ```
 - Open Pipelines/build.yml in a text editor and fill in everything that says FILL_THIS_IN.
 - Rearrange the Terraform directory to look like the one in GoReporting and TemplateService.
-- Add a backend.conf, similar to one of the two projects above. Make sure the information in it is correct.
-- From the CommonDevops/us directory, run the following from Powershell and make sure the result looks reasonable. You will probably need to do some adjusting to your Terraform files to make them work in this new system, but you should get helpful errors to make that easy:
+- Add a backend.conf, using sample-backend.conf as a template. Make sure the information in it is correct.
+- From the CommonDevops/US directory, run the following from Powershell and make sure the result looks reasonable. You will probably need to do some adjusting to your Terraform files to make them work in this new system, but you should get helpful errors to help:
 ```
 ./terraform_init.ps1
 terraform plan
@@ -32,7 +32,20 @@ terraform plan
     - Authorize
     - Service connection name: github (all lowercase)
     - Save
-- Manually trigger a build in Azure pipelines
-- Navigate into the Job
-- You will see a banner asking for permission with a button to grant permission. Use this button to grant permission.
+- Commit and push all your changes from above.
+- Add and run the new pipeline in Azure Devops
+  - Rocket icon > pipeline
+  - New pipeline
+  - Github
+  - Change My Repositories to All Repositories and find your repo
+  - Existing Azure Pipelines YAML File
+  - Branch: add-common-devops, Path: /Pipelines/build.yml
+  - Continue
+  - Run
+  - You will see a banner asking for permission with a button to grant permission. Use this button to grant permission.
 - The build should begin. If there are any errors, fix them.
+- The build will default to a pretty meaningless name. Rename it to 'build' using the elipses (...) menu.
+- Create a new release
+  - Navigate to the releases pipelnes (Rocket icon > Releases)
+  - New > New release pipeline
+  - Model after one of the other projects, such as IotDataStream
