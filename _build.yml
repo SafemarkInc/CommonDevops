@@ -19,7 +19,7 @@ steps:
   inputs:
     version: '6.0.x'
 
-- script: dotnet test "%SYSTEM_TEAMPROJECT%\${{ parameters.testProjectPath }}"
+- script: dotnet test "${{ split(variables['Build.Repository.Name'],'.')[1] }}/${{ parameters.testProjectPath }}"
   condition: ne('${{ parameters.testProjectPath }}', '')
   displayName: dotnet test
 
@@ -32,7 +32,7 @@ steps:
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: "${{ split(variables['Build.DefinitionName'],'.')[1] }}/${{ parameters.buildProjectPath }}"
+    projects: "${{ split(variables['Build.Repository.Name'],'.')[1] }}/${{ parameters.buildProjectPath }}"
     publishWebProjects: false
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
