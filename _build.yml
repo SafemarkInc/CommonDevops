@@ -16,9 +16,9 @@ parameters:
 steps:
 - bash: |
     printenv
-    echo '$(Build.DefinitionName)'
-    echo '$(split(Build.DefinitionName), ".")'
-    echo '$(split(Build.DefinitionName), ".")[1]'
+    echo "$(Build.DefinitionName)"
+    echo "${{ split(Build.DefinitionName), '.' }}"
+    echo '${{ split(Build.DefinitionName), ".")[1] }}'
     ls -R
 
 - task: UseDotNet@2 
