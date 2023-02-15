@@ -32,7 +32,7 @@ steps:
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: '${{ join(split($(Build.DefinitionName), '.')[1], '/', parameters.buildProjectPath }}'
+    projects: 'parameters.buildProjectPath'
     publishWebProjects: false
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
