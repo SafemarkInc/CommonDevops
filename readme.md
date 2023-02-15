@@ -33,14 +33,14 @@ terraform plan
     - Service connection name: github (all lowercase)
     - Save
 - Commit and push all your changes from above.
-- Add the new pipeline in Azure Devops
+- Add and run the new pipeline in Azure Devops
   - Rocket icon > pipeline
   - New pipeline
   - Github
   - Change My Repositories to All Repositories and find your repo
   - Existing Azure Pipelines YAML File
   - Branch: add-common-devops, Path: /Pipelines/build.yml
-- Manually trigger a build in Azure pipelines
-- Navigate into the Job
-- You will see a banner asking for permission with a button to grant permission. Use this button to grant permission.
+  - Continue
+  - Run
+  - You will see a banner asking for permission with a button to grant permission. Use this button to grant permission.
 - The build should begin. If there are any errors, fix them.
