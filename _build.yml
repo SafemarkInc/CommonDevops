@@ -36,7 +36,6 @@ steps:
     publishWebProjects: false
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
-    #     echo "3: ${{ split(variables['Build.DefinitionName'],'.')[1] }}/${{ split(variables['Build.DefinitionName'],'.')[1] }}"
 
 - powershell: |
     $ProjectDir = ${Env:BUILD_REPOSITORY_NAME}.Split("/")[1]
