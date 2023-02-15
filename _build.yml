@@ -14,10 +14,6 @@ parameters:
   default: ''
 
 steps:
-- bash: |
-    echo "${{ variables['Build.Repository.Name'] }}"
-    echo "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }}"
-
 - task: UseDotNet@2 
   displayName: ".NET Core 6.0.x"
   inputs:
