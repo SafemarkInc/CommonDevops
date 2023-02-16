@@ -12,6 +12,9 @@ parameters:
 - name: terraformFunctionName
   type: string
   default: ''
+- name: efcoreDbContext
+  type: string
+  default: ''
 
 steps:
 - task: UseDotNet@2 
@@ -40,7 +43,7 @@ steps:
 - script: |
     dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
     dotnet tool install --global dotnet-ef --version 6.0.12
-    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} --idempotent --context Safemark.SafemarkGoPaymentService.Database.BloggingContext
+    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }}
   displayName: Generate SQL upgrade script
 
 - powershell: |
