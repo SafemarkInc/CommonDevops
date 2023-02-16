@@ -40,7 +40,7 @@ steps:
 - script: |
     dotnet add ./SafemarkGoPaymentService\SafemarkGoPaymentService/SafemarkGoPaymentService.csproj package Microsoft.EntityFrameworkCore.Design --version 6.0.12
     dotnet tool install --global dotnet-ef --version 6.0.12
-    dotnet ef migrations script --project ./SafemarkGoPaymentService/SafemarkGoPaymentService/SafemarkGoPaymentService --idempotent
+    dotnet ef migrations script --project ./SafemarkGoPaymentService/SafemarkGoPaymentService/SafemarkGoPaymentService.csproj --idempotent
   displayName: Generate SQL upgrade script
 
 - powershell: |
