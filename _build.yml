@@ -37,6 +37,12 @@ steps:
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
 
+- script: |
+    dotnet add ./SafemarkGoPaymentService\SafemarkGoPaymentService/SafemarkGoPaymentService.csproj package Microsoft.EntityFrameworkCore.Design --version 6.0.12
+    dotnet tool install --global dotnet-ef --version 6.0.12
+    dotnet ef migrations script --project ./SafemarkGoPaymentService/SafemarkGoPaymentService/SafemarkGoPaymentService --idempotent
+  displayName: Generate SQL upgrade script
+
 - powershell: |
     $ProjectDir = ${Env:BUILD_REPOSITORY_NAME}.Split("/")[1]
     New-Item -Name deploy -ItemType "Directory"
