@@ -44,11 +44,12 @@ steps:
     dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
     dotnet tool install --global dotnet-ef --version 6.0.12
     dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }} --output ./deploy/upgrade_schema.sql
+  condition: ne('${{ parameters.efcoreDbContext }}', '')
   displayName: Generate SQL upgrade script
 
 - powershell: |
     $ProjectDir = ${Env:BUILD_REPOSITORY_NAME}.Split("/")[1]
-    New-Item -Name deploy -ItemType "Directory"
+    New-Item -Name deploy -ItemType "Directory" -Force
     $DeployScript = Get-Content .\CommonDevops\deploy.ps1
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
