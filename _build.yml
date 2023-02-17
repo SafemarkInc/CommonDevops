@@ -15,9 +15,20 @@ parameters:
 - name: efcoreDbContext
   type: string
   default: ''
+- name: efcoreTerraformDbName
+  type: string
+  default: ''
 
 steps:
-- task: UseDotNet@2 
+- powershell: |
+    $efcoreDbContext = ${{ parameters.efcoreDbContext }}
+    $efcoreTerraformDbName = ${{ parameters.efcoreTerraformDbName }}
+    if (($efcoreDbContext -eq '') -ne ($efcoreTerraformDbName -eq '')) {
+      throw '''efcoreDbContext'' and ''efcoreTerraformDbName'' parameters need to either both exist or both be omitted.'
+    }
+  displayName: Validate Pipeline Parameters
+
+- task: UseDotNet@2
   displayName: ".NET Core 6.0.x"
   inputs:
     version: '6.0.x'
@@ -56,6 +67,7 @@ steps:
     $DeployScript = ,('$MainResourceName = "${{ parameters.terraformMainResource }}"') + $DeployScript
     $DeployScript = ,('$TerraformWebappName = "${{ parameters.terraformWebappName }}"') + $DeployScript
     $DeployScript = ,('$TerraformFunctionName = "${{ parameters.terraformFunctionName }}"') + $DeployScript
+    $DeployScript = ,('$EfcoreTerraformDbName = "${{ parameters.EfcoreTerraformDbName }}"') + $DeployScript
     $DeployScript | Out-File ./deploy/deploy.ps1
     Copy-Item -Path "$ProjectDir\Terraform" -Destination "./deploy" -Recurse -Verbose
     New-Item "./deploy/CommonDevops" -ItemType Directory

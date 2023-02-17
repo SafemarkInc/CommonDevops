@@ -39,7 +39,7 @@ $AllResources = $TerraformState.values.root_module.child_modules[0].child_module
 Set-Location ../..
 
 if (Test-Path .\upgrade_schema.sql -PathType Leaf) {
-    $TerraformSqlDatabase = $AllResources | Where-Object {$_.address -eq 'module.common.module.all_resources.azurerm_mssql_database.main'} | Select-Object -ExpandProperty values
+    $TerraformSqlDatabase = $AllResources | Where-Object {$_.address -eq $EfcoreTerraformDbName } | Select-Object -ExpandProperty values
     $SqlDatabaseIdParts = $TerraformSqlDatabase.id.Split('/')
     $SqlServerResourceGroupName = $SqlDatabaseIdParts[4]
     $SqlServerName = $SqlDatabaseIdParts[8]
