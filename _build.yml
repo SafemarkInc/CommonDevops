@@ -24,9 +24,9 @@ steps:
     $efcoreDbContext = '${{ parameters.efcoreDbContext }}'
     $efcoreTerraformDbName = '${{ parameters.efcoreTerraformDbName }}'
     if (($efcoreDbContext -eq '') -ne ($efcoreTerraformDbName -eq '')) {
-      Write-Error '''efcoreDbContext'' and ''efcoreTerraformDbName'' parameters need to either both exist or both be omitted.'
-      exit(1)
+      throw '''efcoreDbContext'' and ''efcoreTerraformDbName'' parameters need to either both exist or both be omitted.'
     }
+  failOnStderr: true
   displayName: Validate Pipeline Parameters
 
 - task: UseDotNet@2
