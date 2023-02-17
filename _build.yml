@@ -21,8 +21,9 @@ parameters:
 
 steps:
 - powershell: |
-    $efcoreDbContext = ${{ parameters.efcoreDbContext }}
-    $efcoreTerraformDbName = ${{ parameters.efcoreTerraformDbName }}
+    $ErrorActionPreference = "Stop"
+    $efcoreDbContext = '${{ parameters.efcoreDbContext }}'
+    $efcoreTerraformDbName = '${{ parameters.efcoreTerraformDbName }}'
     if (($efcoreDbContext -eq '') -ne ($efcoreTerraformDbName -eq '')) {
       throw '''efcoreDbContext'' and ''efcoreTerraformDbName'' parameters need to either both exist or both be omitted.'
     }
