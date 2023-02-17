@@ -37,6 +37,16 @@ steps:
   condition: and(succeeded(), ne('${{ parameters.testProjectPath }}', ''))
   displayName: dotnet test
 
+# Running EF Core requires the Microsoft.EntityFrameworkCore.Design package, but publishing and running the project
+# does not. Remove it after EF Core runs to lighten things a little.
+- script: |
+    dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
+    dotnet tool install --global dotnet-ef --version 6.0.12
+    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }} --output ./deploy/upgrade_schema.sql
+    dotnet remove ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design
+  condition: and(succeeded(), ne('${{ parameters.efcoreDbContext }}', ''))
+  displayName: Generate SQL upgrade script
+
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/dotnet-core-cli-v2?view=azure-pipelines
 # If [publishWebProjects] is set to true, the projects property value is skipped, and the task tries to find the web
 # projects in the repository and run the publish command on them.
@@ -50,13 +60,6 @@ steps:
     publishWebProjects: false
     arguments: '--configuration Release --output Publish'
     zipAfterPublish: True
-
-- script: |
-    dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
-    dotnet tool install --global dotnet-ef --version 6.0.12
-    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }} --output ./deploy/upgrade_schema.sql
-  condition: and(succeeded(), ne('${{ parameters.efcoreDbContext }}', ''))
-  displayName: Generate SQL upgrade script
 
 - powershell: |
     $ProjectDir = ${Env:BUILD_REPOSITORY_NAME}.Split("/")[1]
