@@ -14,7 +14,11 @@ provider "azuread" {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = false
+    }
+  }
   environment     = "china"
   subscription_id = var.AZURE_SUBSCRIPTIONID
   client_id       = var.AZURE_CLIENTID

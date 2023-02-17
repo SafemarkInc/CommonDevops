@@ -38,6 +38,31 @@ $TerraformState = terraform show -json | ConvertFrom-Json
 $AllResources = $TerraformState.values.root_module.child_modules[0].child_modules.resources
 Set-Location ../..
 
+if (Test-Path .\upgrade_schema.sql -PathType Leaf) {
+    $TerraformSqlDatabase = $AllResources | Where-Object {$_.address -eq $EfcoreTerraformDbName } | Select-Object -ExpandProperty values
+    $SqlDatabaseIdParts = $TerraformSqlDatabase.id.Split('/')
+    $SqlServerResourceGroupName = $SqlDatabaseIdParts[4]
+    $SqlServerName = $SqlDatabaseIdParts[8]
+    $TerraformSqlServer = $TerraformSqlServer = $AllResources | Select-Object -ExpandProperty values | Where-Object { $_.name -eq $SqlServerName }
+    $SqlServerUserName = $TerraformSqlServer.administrator_login
+    $SqlServerPassword = $TerraformSqlServer.administrator_login_password
+
+    $myIp = (Invoke-WebRequest -uri "https://ifconfig.me/ip").Content
+    
+    # az sql server firewall-rule CREATE will update if the rule already exists
+    Write-Output 'Creating DB firewall rule...'
+    az sql server firewall-rule create -n DevopsDeployment -g $SqlServerResourceGroupName -s $SqlServerName --start-ip-address $myIp --end-ip-address $myIp
+
+    Write-Output 'Done. Running upgrade_schema.sql..'
+    Invoke-Sqlcmd -InputFile "upgrade_schema.sql" -ServerInstance $TerraformSqlServer.fully_qualified_domain_name -Database $TerraformSqlDatabase.name -Username $SqlServerUserName -Password $SqlServerPassword -OutputSqlErrors $true -Verbose -AbortOnError
+
+    # The DB servers and databases have a "Delete Lock" so that I don't accidentally delete them in Terraform.
+    # Appararently, this prevents deleting firewall rules also. Use this workaround instead.
+    Write-Output 'Done. Invalidating DB firewall rule...'
+    az sql server firewall-rule create -n DevopsDeployment -g $SqlServerResourceGroupName -s $SqlServerName --start-ip-address 127.0.0.1 --end-ip-address 127.0.0.1
+    Write-Output 'Done.'
+}
+
 if ($TerraformWebappName.Length -gt 0) {
     $TerraformWebapp = $AllResources | Where-Object {$_.address -eq $TerraformWebappName} | Select-Object -ExpandProperty values
 } else {
