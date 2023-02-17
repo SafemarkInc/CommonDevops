@@ -53,13 +53,14 @@ if (Test-Path .\upgrade_schema.sql -PathType Leaf) {
     Write-Output 'Creating DB firewall rule...'
     az sql server firewall-rule create -n DevopsDeployment -g $SqlServerResourceGroupName -s $SqlServerName --start-ip-address $myIp --end-ip-address $myIp
 
-    Write-Output 'Running upgrade_schema.sql'
+    Write-Output 'Done. Running upgrade_schema.sql..'
     Invoke-Sqlcmd -InputFile "upgrade_schema.sql" -ServerInstance $TerraformSqlServer.fully_qualified_domain_name -Database $TerraformSqlDatabase.name -Username $SqlServerUserName -Password $SqlServerPassword -OutputSqlErrors $true -Verbose -AbortOnError
 
     # The DB servers and databases have a "Delete Lock" so that I don't accidentally delete them in Terraform.
     # Appararently, this prevents deleting firewall rules also. Use this workaround instead.
-    Write-Output 'Invalidating DB firewall rule...'
+    Write-Output 'Done. Invalidating DB firewall rule...'
     az sql server firewall-rule create -n DevopsDeployment -g $SqlServerResourceGroupName -s $SqlServerName --start-ip-address 127.0.0.1 --end-ip-address 127.0.0.1
+    Write-Output 'Done.'
 }
 
 if ($TerraformWebappName.Length -gt 0) {
