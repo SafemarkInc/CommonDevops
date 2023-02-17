@@ -39,20 +39,27 @@ $AllResources = $TerraformState.values.root_module.child_modules[0].child_module
 Set-Location ../..
 
 if (Test-Path .\upgrade_schema.sql -PathType Leaf) {
-    $TerraformSqlServer = $AllResources.resources | Where-Object {$_.address -eq 'module.common.module.all_resources.azurerm_sql_server.main'} | Select-Object -ExpandProperty values
+    $TerraformSqlDatabase = $AllResources | Where-Object {$_.address -eq 'module.common.module.all_resources.azurerm_mssql_database.main'} | Select-Object -ExpandProperty values
+    $SqlDatabaseIdParts = $TerraformSqlDatabase.id.Split('/')
+    $SqlServerResourceGroupName = $SqlDatabaseIdParts[4]
+    $SqlServerName = $SqlDatabaseIdParts[8]
+    $TerraformSqlServer = $TerraformSqlServer = $AllResources | Select-Object -ExpandProperty values | Where-Object { $_.name -eq $SqlServerName }
+    $SqlServerUserName = $TerraformSqlServer.administrator_login
+    $SqlServerPassword = $TerraformSqlServer.administrator_login_password
+
     $myIp = (Invoke-WebRequest -uri "https://ifconfig.me/ip").Content
     
     # az sql server firewall-rule CREATE will update if the rule already exists
     Write-Output 'Creating DB firewall rule...'
-    az sql server firewall-rule create -n DevopsDeployment -g $TerraformResourceGroup.name -s $TerraformSqlServer.name --start-ip-address $myIp --end-ip-address $myIp
+    az sql server firewall-rule create -n DevopsDeployment -g $SqlServerResourceGroupName -s $SqlServerName --start-ip-address $myIp --end-ip-address $myIp
 
     Write-Output 'Running upgrade_schema.sql'
-    Invoke-Sqlcmd -InputFile "upgrade_schema.sql" -ServerInstance $TerraformSqlServer.fully_qualified_domain_name -Database $TerraformSqlDatabase.name -Username 'gorolleod' -Password $TerraformSqlPassword -OutputSqlErrors $true -Verbose -AbortOnError
+    Invoke-Sqlcmd -InputFile "upgrade_schema.sql" -ServerInstance $TerraformSqlServer.fully_qualified_domain_name -Database $TerraformSqlDatabase.name -Username $SqlServerUserName -Password $SqlServerPassword -OutputSqlErrors $true -Verbose -AbortOnError
 
     # The DB servers and databases have a "Delete Lock" so that I don't accidentally delete them in Terraform.
     # Appararently, this prevents deleting firewall rules also. Use this workaround instead.
     Write-Output 'Invalidating DB firewall rule...'
-    az sql server firewall-rule create -n DevopsDeployment -g $ResourceGroupName -s $GopodDbServer --start-ip-address 127.0.0.1 --end-ip-address 127.0.0.1
+    az sql server firewall-rule create -n DevopsDeployment -g $SqlServerResourceGroupName -s $SqlServerName --start-ip-address 127.0.0.1 --end-ip-address 127.0.0.1
 }
 
 if ($TerraformWebappName.Length -gt 0) {
