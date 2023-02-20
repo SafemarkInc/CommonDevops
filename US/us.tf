@@ -21,5 +21,6 @@ provider "azurerm" {
 
 module "common" {
   source   = "./.."
+  CLOUD    = "us"
   LOCATION = "centralus"
 }

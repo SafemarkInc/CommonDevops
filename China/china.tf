@@ -28,5 +28,6 @@ provider "azurerm" {
 
 module "common" {
   source   = "./.."
+  CLOUD    = "china"
   LOCATION = "chinaeast2"
 }
