@@ -1,4 +1,5 @@
 variable "LOCATION" { type = string }
+variable "CLOUD"    { type = string }
 
 locals {
   parsed_workspace              = element(split("_", terraform.workspace), 1)
@@ -18,6 +19,7 @@ locals {
 module "all_resources" {
   source                        = "../Terraform"
   LOCATION                      = var.LOCATION
+  CLOUD                         = var.CLOUD
   SMIDSHARED_RESOURCEGROUP_NAME = local.smidshared_resourcegroup_name
   SMIDSHARED_KEYVAULT_NAME      = local.smidshared_keyvault_name
   SMID_WEBAPP_URL               = local.smid_webapp_url
