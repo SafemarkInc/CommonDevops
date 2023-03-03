@@ -72,7 +72,7 @@ steps:
 
 - powershell: |
     $ProjectDir = ${Env:BUILD_REPOSITORY_NAME}.Split("/")[1]
-    New-Item -Name deploy -ItemType "Directory" -Force
+    New-Item -Name deploy -ItemType Directory -Force
     $DeployScript = Get-Content .\CommonDevops\deploy.ps1
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
@@ -88,8 +88,8 @@ steps:
     Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/CommonDevops" -Recurse -Verbose
     Copy-Item "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/CommonDevops"
     Copy-Item "./CommonDevops/common.tf" -Destination "./deploy/CommonDevops"
-    New-Item Webapp
-    Copy-Item -Path "PublishWebapp/*" -Destination "./deploy/Webapp"
+    New-Item -Name Webapp -ItemType Directory
+    Copy-Item -Path "PublishWebapp/*" -Destination "./deploy/Webapp/*"
   displayName: Assemble the deployment package
   
 - publish: ./deploy
