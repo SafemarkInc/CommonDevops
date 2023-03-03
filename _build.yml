@@ -88,8 +88,8 @@ steps:
     Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/CommonDevops" -Recurse -Verbose
     Copy-Item "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/CommonDevops"
     Copy-Item "./CommonDevops/common.tf" -Destination "./deploy/CommonDevops"
-    New-Item -Name Webapp -ItemType Directory
-    Copy-Item -Path "PublishWebapp/*" -Destination "./deploy/Webapp/*"
+    New-Item -Name ./deploy/Webapp -ItemType Directory
+    Copy-Item -Path "PublishWebapp/*" -Destination "./deploy/Webapp"
   displayName: Assemble the deployment package
   
 - publish: ./deploy
