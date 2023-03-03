@@ -73,9 +73,9 @@ if ($TerraformWebappName.Length -gt 0) {
 
 if ($TerraformFunctionName.Length -gt 0) {
     $TerraformFunction = $AllResources | Where-Object {$_.address -eq $TerraformFunctionName} | Select-Object -ExpandProperty values
-    $deploymentFile = Get-ChildItem AzureFunction/*.zip -Name
+    $deploymentFile = Get-ChildItem Azurefunction/*.zip -Name
     Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformFunction.name) ..."
-    az functionapp deployment source config-zip -g $TerraformFunction.resource_group_name -n $TerraformFunction.name --src $deploymentFile
+    az functionapp deployment source config-zip -g $TerraformFunction.resource_group_name -n $TerraformFunction.name --src Azurefunction/$deploymentFile
     Write-Output "$(Get-TimeStamp) Done."
 }
 
