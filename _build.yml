@@ -1,6 +1,8 @@
 parameters:
 - name: webappProjectPath
   type: string
+- name: azurefunctionProjectPath
+  type: string
 - name: testProjectPath
   type: string
   default: ''
@@ -53,21 +55,22 @@ steps:
 #
 # We want to specify which projects to build instead of searching and building all of them.
 - task: DotNetCoreCLI@2
-  displayName: dotnet publish
+  displayName: dotnet publish webapp
   inputs:
     command: publish
     projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }}"
     publishWebProjects: false
-    arguments: '--configuration Release --output PublishWebapp'
+    arguments: '--configuration Release --output ./deploy/Webapp'
     zipAfterPublish: True
 
 - task: DotNetCoreCLI@2
-  displayName: dotnet publish
+  displayName: dotnet publish azurefunction
+  condition: and(succeeded(), ne('${{ parameters.azurefunctionProjectPath }}', ''))
   inputs:
     command: publish
-    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }}"
+    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.azurefunctionProjectPath }}"
     publishWebProjects: false
-    arguments: '--configuration Release --output PublishWebapp'
+    arguments: '--configuration Release --output ./deploy/Azurefunction'
     zipAfterPublish: True
 
 - powershell: |
@@ -88,8 +91,6 @@ steps:
     Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/CommonDevops" -Recurse -Verbose
     Copy-Item "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/CommonDevops"
     Copy-Item "./CommonDevops/common.tf" -Destination "./deploy/CommonDevops"
-    New-Item -Name ./deploy/Webapp -ItemType Directory
-    Copy-Item -Path "PublishWebapp/*" -Destination "./deploy/Webapp"
   displayName: Assemble the deployment package
   
 - publish: ./deploy
