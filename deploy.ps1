@@ -68,7 +68,7 @@ if ($TerraformWebappName.Length -gt 0) {
 } else {
     $TerraformFunction = $AllResources | Where-Object {$_.address -eq $TerraformFunctionName} | Select-Object -ExpandProperty values
 }
-$deploymentFile = Get-ChildItem *.zip -Name
+$deploymentFile = Get-ChildItem Webapp/*.zip -Name
 
 if ($null -ne $TerraformWebapp) {
     Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformWebapp.name) ..."

@@ -1,5 +1,5 @@
 parameters:
-- name: buildProjectPath
+- name: webappProjectPath
   type: string
 - name: testProjectPath
   type: string
@@ -56,9 +56,18 @@ steps:
   displayName: dotnet publish
   inputs:
     command: publish
-    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }}"
+    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }}"
     publishWebProjects: false
-    arguments: '--configuration Release --output Publish'
+    arguments: '--configuration Release --output PublishWebapp'
+    zipAfterPublish: True
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet publish
+  inputs:
+    command: publish
+    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }}"
+    publishWebProjects: false
+    arguments: '--configuration Release --output PublishWebapp'
     zipAfterPublish: True
 
 - powershell: |
@@ -79,7 +88,8 @@ steps:
     Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/CommonDevops" -Recurse -Verbose
     Copy-Item "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/CommonDevops"
     Copy-Item "./CommonDevops/common.tf" -Destination "./deploy/CommonDevops"
-    Copy-Item -Path "Publish/*" -Destination "./deploy"
+    New-Item Webapp
+    Copy-Item -Path "PublishWebapp/*" -Destination "./deploy/Webapp"
   displayName: Assemble the deployment package
   
 - publish: ./deploy
