@@ -40,10 +40,10 @@ steps:
 # Running EF Core requires the Microsoft.EntityFrameworkCore.Design package, but publishing and running the project
 # does not. Remove it after EF Core runs to lighten things a little.
 - script: |
-    dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
+    dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
     dotnet tool install --global dotnet-ef --version 6.0.12
-    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }} --output ./deploy/upgrade_schema.sql
-    dotnet remove ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design
+    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }} --output ./deploy/upgrade_schema.sql
+    dotnet remove ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }} package Microsoft.EntityFrameworkCore.Design
   condition: and(succeeded(), ne('${{ parameters.efcoreDbContext }}', ''))
   displayName: Generate SQL upgrade script
 
