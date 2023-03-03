@@ -65,20 +65,21 @@ if (Test-Path .\upgrade_schema.sql -PathType Leaf) {
 
 if ($TerraformWebappName.Length -gt 0) {
     $TerraformWebapp = $AllResources | Where-Object {$_.address -eq $TerraformWebappName} | Select-Object -ExpandProperty values
-} else {
-    $TerraformFunction = $AllResources | Where-Object {$_.address -eq $TerraformFunctionName} | Select-Object -ExpandProperty values
-}
-$deploymentFile = Get-ChildItem Webapp/*.zip -Name
-
-if ($null -ne $TerraformWebapp) {
+    $deploymentFile = Get-ChildItem Webapp/*.zip -Name
     Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformWebapp.name) ..."
-    az webapp deployment source config-zip -g $TerraformWebapp.resource_group_name --n $TerraformWebapp.name --src $deploymentFile
-} else {
+    az webapp deployment source config-zip -g $TerraformWebapp.resource_group_name --n $TerraformWebapp.name --src Webapp/$deploymentFile
+    Write-Output "$(Get-TimeStamp) Done."
+}
+
+if ($TerraformFunctionName.Length -gt 0) {
+    $TerraformFunction = $AllResources | Where-Object {$_.address -eq $TerraformFunctionName} | Select-Object -ExpandProperty values
+    $deploymentFile = Get-ChildItem AzureFunction/*.zip -Name
     Write-Output "$(Get-TimeStamp) Deploying $deploymentFile to $($TerraformFunction.name) ..."
     az functionapp deployment source config-zip -g $TerraformFunction.resource_group_name -n $TerraformFunction.name --src $deploymentFile
+    Write-Output "$(Get-TimeStamp) Done."
 }
+
 if ($LASTEXITCODE -ne 0) { throw }
-Write-Output "$(Get-TimeStamp) Done."
 
 $TerraformResourceGroup = $AllResources | Where-Object {$_.address -eq $MainResourceName} | Select-Object -ExpandProperty values
 Write-Output "$(Get-TimeStamp) Updating labels for $($TerraformResourceGroup.name) ..."
