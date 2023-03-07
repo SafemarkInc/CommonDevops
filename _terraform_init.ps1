@@ -29,14 +29,16 @@ terraform workspace select $workspace -no-color
 $OldAddressPrefix = 'module.all_resources.'
 $NewAddressPrefix = 'module.common.module.all_resources.'
 $TerraformState = terraform show -json | ConvertFrom-Json
-$ResourcesInOldNamespace = $TerraformState.values.root_module.child_modules[0].resources |
-    Where-Object {$_.address -like "$OldAddressPrefix*" }
+if ($null -ne $TerraformState.values) {
+    $ResourcesInOldNamespace = $TerraformState.values.root_module.child_modules[0].resources |
+        Where-Object {$_.address -like "$OldAddressPrefix*" }
 
-foreach ($ResourceInOldNamespace in $ResourcesInOldNamespace) {
-    $OldAddress = $ResourceInOldNamespace.address
-    $NewAddress = $OldAddress.replace($OldAddressPrefix, $NewAddressPrefix)    
-    Write-Output "Migrating $OldAddress to $NewAddress..."
-    terraform state mv $OldAddress $NewAddress
-    Write-Output "Done."
-    Write-Output ""
+    foreach ($ResourceInOldNamespace in $ResourcesInOldNamespace) {
+        $OldAddress = $ResourceInOldNamespace.address
+        $NewAddress = $OldAddress.replace($OldAddressPrefix, $NewAddressPrefix)    
+        Write-Output "Migrating $OldAddress to $NewAddress..."
+        terraform state mv $OldAddress $NewAddress
+        Write-Output "Done."
+        Write-Output ""
+    }
 }
