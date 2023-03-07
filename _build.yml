@@ -1,5 +1,7 @@
 parameters:
-- name: buildProjectPath
+- name: webappProjectPath
+  type: string
+- name: azurefunctionProjectPath
   type: string
 - name: testProjectPath
   type: string
@@ -40,10 +42,10 @@ steps:
 # Running EF Core requires the Microsoft.EntityFrameworkCore.Design package, but publishing and running the project
 # does not. Remove it after EF Core runs to lighten things a little.
 - script: |
-    dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
+    dotnet add ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }} package Microsoft.EntityFrameworkCore.Design --version 6.0.12
     dotnet tool install --global dotnet-ef --version 6.0.12
-    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }} --output ./deploy/upgrade_schema.sql
-    dotnet remove ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }} package Microsoft.EntityFrameworkCore.Design
+    dotnet ef migrations script --project ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }} --idempotent --context ${{ parameters.efcoreDbContext }} --output ./deploy/upgrade_schema.sql
+    dotnet remove ./${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }} package Microsoft.EntityFrameworkCore.Design
   condition: and(succeeded(), ne('${{ parameters.efcoreDbContext }}', ''))
   displayName: Generate SQL upgrade script
 
@@ -53,17 +55,27 @@ steps:
 #
 # We want to specify which projects to build instead of searching and building all of them.
 - task: DotNetCoreCLI@2
-  displayName: dotnet publish
+  displayName: dotnet publish webapp
   inputs:
     command: publish
-    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.buildProjectPath }}"
+    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.webappProjectPath }}"
     publishWebProjects: false
-    arguments: '--configuration Release --output Publish'
+    arguments: '--configuration Release --output ./deploy/Webapp'
+    zipAfterPublish: True
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet publish azurefunction
+  condition: and(succeeded(), ne('${{ parameters.azurefunctionProjectPath }}', ''))
+  inputs:
+    command: publish
+    projects: "${{ split(variables['Build.Repository.Name'],'/')[1] }}/${{ parameters.azurefunctionProjectPath }}"
+    publishWebProjects: false
+    arguments: '--configuration Release --output ./deploy/Azurefunction'
     zipAfterPublish: True
 
 - powershell: |
     $ProjectDir = ${Env:BUILD_REPOSITORY_NAME}.Split("/")[1]
-    New-Item -Name deploy -ItemType "Directory" -Force
+    New-Item -Name deploy -ItemType Directory -Force
     $DeployScript = Get-Content .\CommonDevops\deploy.ps1
     $DeployScript = ,('$BuildNumber = "' + $Env:BUILD_BUILDNUMBER + '"') + $DeployScript
     $DeployScript = ,('$BuildDate = "' + (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + '"') + $DeployScript
@@ -79,7 +91,6 @@ steps:
     Copy-Item -Path "./CommonDevops/Korea" -Destination "./deploy/CommonDevops" -Recurse -Verbose
     Copy-Item "./CommonDevops/_terraform_init.ps1" -Destination "./deploy/CommonDevops"
     Copy-Item "./CommonDevops/common.tf" -Destination "./deploy/CommonDevops"
-    Copy-Item -Path "Publish/*" -Destination "./deploy"
   displayName: Assemble the deployment package
   
 - publish: ./deploy
